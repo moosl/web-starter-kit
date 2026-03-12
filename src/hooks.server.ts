@@ -38,7 +38,13 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 const handleI18n: Handle = async ({ event, resolve }) => {
 	const { pathname } = event.url;
 
-	if (pathname.startsWith('/api/') || pathname.startsWith('/login') || pathname.startsWith('/.well-known')) {
+	if (
+		pathname.startsWith('/api/') ||
+		pathname.startsWith('/login') ||
+		pathname.startsWith('/.well-known') ||
+		pathname === '/sitemap.xml' ||
+		pathname === '/robots.txt'
+	) {
 		return resolve(event);
 	}
 
@@ -51,7 +57,9 @@ const handleI18n: Handle = async ({ event, resolve }) => {
 		throw redirect(301, target);
 	}
 
-	return resolve(event);
+	return resolve(event, {
+		transformPageChunk: ({ html }) => html.replace('lang="en"', `lang="${firstSegment}"`),
+	});
 };
 
 const handleProtectedRoutes: Handle = async ({ event, resolve }) => {

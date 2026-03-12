@@ -1,4 +1,9 @@
 export const config = {
+	// Site metadata — used for sitemap, canonical URLs, OG tags
+	site: {
+		url: 'https://yourdomain.com', // Base URL (no trailing slash)
+		name: 'AI Image Generator',
+	},
 	// Toggle features on/off. Set to false if the required API keys are not configured.
 	features: {
 		auth: true, // Google OAuth login — requires GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET

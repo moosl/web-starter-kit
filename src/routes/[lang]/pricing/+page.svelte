@@ -1,12 +1,43 @@
 <script lang="ts">
 	import { getMessages } from '$lib/i18n';
+	import { config } from '$lib/config';
 	import SEO from '$lib/components/SEO.svelte';
 
 	let { data }: { data: any } = $props();
 	let msg = $derived(getMessages(data.lang));
+
+	let jsonLd = $derived({
+		'@context': 'https://schema.org',
+		'@type': 'WebApplication',
+		name: config.site.name,
+		url: `${config.site.url}/${data.lang}/pricing`,
+		offers: [
+			{
+				'@type': 'Offer',
+				name: 'Free',
+				price: '0',
+				priceCurrency: 'USD',
+				description: msg.pricing.freeDesc,
+			},
+			{
+				'@type': 'Offer',
+				name: 'Starter',
+				price: '9.00',
+				priceCurrency: 'USD',
+				description: msg.pricing.starterDesc,
+			},
+			{
+				'@type': 'Offer',
+				name: 'Pro',
+				price: '29.00',
+				priceCurrency: 'USD',
+				description: msg.pricing.proDesc,
+			},
+		],
+	});
 </script>
 
-<SEO title={msg.pricing.title} description={msg.pricing.title} />
+<SEO title={msg.pricing.title} description={msg.seo.pricing.description} {jsonLd} />
 
 <section class="max-w-5xl mx-auto px-4 sm:px-6 py-16">
 	<div class="text-center">
