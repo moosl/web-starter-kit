@@ -80,7 +80,7 @@ const handleSecurityHeaders: Handle = async ({ event, resolve }) => {
 	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 	response.headers.set(
 		'Content-Security-Policy',
-		"default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://*.r2.cloudflarestorage.com https://*.googleusercontent.com; connect-src 'self' https://*.google-analytics.com https://*.r2.cloudflarestorage.com; frame-src https://challenges.cloudflare.com",
+		"default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://challenges.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' blob: data: https://*.r2.cloudflarestorage.com https://*.googleusercontent.com; connect-src 'self' https://accounts.google.com https://*.google-analytics.com https://*.r2.cloudflarestorage.com; frame-src https://accounts.google.com https://challenges.cloudflare.com",
 	);
 	return response;
 };

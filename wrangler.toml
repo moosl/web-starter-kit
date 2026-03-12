@@ -1,12 +1,21 @@
 name = "web-starter-kit"
+main = ".svelte-kit/cloudflare/_worker.js"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
+[assets]
+directory = ".svelte-kit/cloudflare"
+binding = "ASSETS"
+
 [[d1_databases]]
 binding = "DB"
+database_name = "web-starter-kit-db"
+database_id = "16c44fc3-3021-4492-aad2-7044fa8f28df"
 
 [[r2_buckets]]
 binding = "R2"
+bucket_name = "web-starter-kit-uploads"
 
 [[kv_namespaces]]
 binding = "KV"
+id = "b4cd15cb022e424eabf800d695143681"

@@ -42,7 +42,7 @@ Hooks in `src/hooks.server.ts` run sequentially via `sequence()`:
 
 ### Auth
 
-Session-based using `@oslojs/crypto` + `@oslojs/encoding`. Tokens are base32-encoded random bytes, stored as SHA-256 hashes in D1. 30-day TTL with 15-day auto-refresh. Google OAuth via `arctic` library. Session cached in KV.
+Session-based using `@oslojs/crypto` + `@oslojs/encoding`. Tokens are base32-encoded random bytes, stored as SHA-256 hashes in D1. 30-day TTL with 15-day auto-refresh. Google OAuth via `arctic` library. Google One Tap login (`/api/auth/google-one-tap`) verifies GIS JWT using Web Crypto API and Google's JWKS endpoint. Session cached in KV.
 
 ### Database
 
@@ -81,4 +81,12 @@ Vitest, pattern `src/**/*.test.ts`. Tests live in `__tests__/` directories adjac
 
 Secrets go in `.dev.vars` (local) — see `.dev.vars.example`. Public env vars in `.env` — see `.env.example`. Never import from `$env/static/private` at module top level in client code.
 
-Per-deployment config (alert email, Creem product IDs) lives in `.dev.vars` env vars, not hardcoded in `config.ts`. See `ALERT_EMAIL`, `CREEM_PRODUCT_ID_STARTER`, `CREEM_PRODUCT_ID_PRO`.
+Alert email is set via `ALERT_EMAIL` env var in `.dev.vars`. Creem product IDs are public config in `config.ts` (`plans.starter.creemProductId`, `plans.pro.creemProductId`).
+
+### SEO
+
+Reusable `SEO.svelte` component handles canonical URLs, Open Graph, Twitter Cards, hreflang alternates, and optional JSON-LD. Site metadata (`url`, `name`) in `config.ts`. Dynamic `sitemap.xml` and `robots.txt` via server routes. `<html lang>` is set dynamically via `transformPageChunk` in hooks.
+
+### Deploy
+
+`npm run deploy` runs `scripts/deploy.sh`: creates D1/R2/KV resources, auto-fills `wrangler.toml` IDs, reads secrets from `.dev.vars`, migrates DB, and deploys. `wrangler.toml` ships without hardcoded resource IDs — the script fills them per-account.

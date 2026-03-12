@@ -2,6 +2,7 @@
 	import { getMessages } from '$lib/i18n';
 	import { config } from '$lib/config';
 	import Toast from '$lib/components/Toast.svelte';
+	import GoogleOneTap from '$lib/components/GoogleOneTap.svelte';
 	import type { Snippet } from 'svelte';
 
 	let { data, children }: { data: any; children: Snippet } = $props();
@@ -67,3 +68,7 @@
 </div>
 
 <Toast />
+
+{#if !data.user && config.features.auth}
+	<GoogleOneTap />
+{/if}

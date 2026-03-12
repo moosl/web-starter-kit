@@ -23,10 +23,12 @@ export const config = {
 		starter: {
 			price: 900, // Price in cents ($9.00)
 			credits: 100, // Credits included in this plan
+			creemProductId: 'prod_2Pxo8JfyAgGsS6b7kPj5Nq', // Creem product ID (public, visible in checkout URL)
 		},
 		pro: {
 			price: 2900, // Price in cents ($29.00)
 			credits: 500, // Credits included in this plan
+			creemProductId: 'prod_1vTlcO2igKGGOCFyK4uBqA', // Creem product ID (public, visible in checkout URL)
 		},
 	},
 	// Credit system settings

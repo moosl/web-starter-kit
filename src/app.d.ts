@@ -20,8 +20,6 @@ declare global {
 				GOOGLE_CLIENT_SECRET: string;
 				CREEM_API_KEY: string;
 				CREEM_WEBHOOK_SECRET: string;
-				CREEM_PRODUCT_ID_STARTER: string;
-				CREEM_PRODUCT_ID_PRO: string;
 				REPLICATE_API_TOKEN: string;
 				RESEND_API_KEY: string;
 				ALERT_EMAIL: string;

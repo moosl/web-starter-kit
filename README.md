@@ -77,6 +77,10 @@ npm run dev      # http://localhost:5173
     GOOGLE_CLIENT_ID=xxxxxxxxxxxx.apps.googleusercontent.com
     GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxx
     ```
+13. 把同样的 Client ID 填入 `.env`（用于浏览器端 One Tap 登录）：
+    ```
+    PUBLIC_GOOGLE_CLIENT_ID=xxxxxxxxxxxx.apps.googleusercontent.com
+    ```
 
 ---
 
@@ -101,23 +105,22 @@ npm run dev      # http://localhost:5173
 
 ### 3. Creem（支付）
 
-**需要配置：** `CREEM_API_KEY` + `CREEM_WEBHOOK_SECRET` + `CREEM_PRODUCT_ID_STARTER` + `CREEM_PRODUCT_ID_PRO`
+**需要配置：** `CREEM_API_KEY` + `CREEM_WEBHOOK_SECRET`
 **对应 feature flag：** `payments`
 
 1. 打开 [creem.io](https://creem.io)，注册/登录
 2. Dashboard 左侧菜单 > **API Keys**
 3. 创建一个 API Key，复制
 4. 左侧菜单 > **Products** > 创建 Starter 和 Pro 两个产品，复制各自的 Product ID
-5. 左侧菜单 > **Webhooks** > 添加 Webhook endpoint：
+5. 把 Product ID 填入 `src/lib/config.ts` 的 `plans.starter.creemProductId` 和 `plans.pro.creemProductId`
+6. 左侧菜单 > **Webhooks** > 添加 Webhook endpoint：
    - URL: `https://your-domain.com/api/webhook/creem`（本地测试需要 ngrok 等隧道工具）
    - Events: 勾选 `checkout.completed`
-6. 复制 Webhook signing secret
-7. 填入 `.dev.vars`：
+7. 复制 Webhook signing secret
+8. 填入 `.dev.vars`：
    ```
    CREEM_API_KEY=creem_xxxxxxxxxxxxxxxx
    CREEM_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxx
-   CREEM_PRODUCT_ID_STARTER=prod_xxxxxxxxxxxxxxxx
-   CREEM_PRODUCT_ID_PRO=prod_xxxxxxxxxxxxxxxx
    ```
 
 > 本地测试支付 webhook 需要公网 URL。可以用 [ngrok](https://ngrok.com) 或 [cloudflared tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)。
@@ -190,9 +193,9 @@ npm run dev      # http://localhost:5173
 
 | Feature | 需要的 Key | Feature Flag | 必须配？ |
 |---|---|---|---|
-| 用户登录 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | `auth` | 推荐 |
+| 用户登录 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `PUBLIC_GOOGLE_CLIENT_ID`（`.env`） | `auth` | 推荐 |
 | AI 生图 | `REPLICATE_API_TOKEN` | `ai` | 核心功能 |
-| 支付 | `CREEM_API_KEY`, `CREEM_WEBHOOK_SECRET`, `CREEM_PRODUCT_ID_STARTER`, `CREEM_PRODUCT_ID_PRO` | `payments` | 可后配 |
+| 支付 | `CREEM_API_KEY`, `CREEM_WEBHOOK_SECRET` + Product ID 在 config.ts | `payments` | 可后配 |
 | 人机验证 | `TURNSTILE_SECRET_KEY`, `PUBLIC_TURNSTILE_SITE_KEY` | `turnstile` | 可后配 |
 | 文件上传 | `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT` | `upload` | 可后配 |
 | 积分系统 | 无需 key | `credits` | 无需 key |
@@ -272,7 +275,7 @@ One command handles everything:
 1. Logs in to Cloudflare (if not already)
 2. Creates D1 database, R2 bucket, KV namespace (skips if they exist)
 3. Auto-updates `wrangler.toml` with resource IDs
-4. Prompts for each secret (press Enter to skip any)
+4. Reads secrets from `.dev.vars` and sets them automatically (empty values are skipped)
 5. Migrates remote database
 6. Deploys to Cloudflare Workers
 

@@ -13,14 +13,6 @@ export const GET: RequestHandler = async ({ url, locals, platform }) => {
 	const env = platform!.env;
 	const planConfig = config.plans[plan as keyof typeof config.plans];
 
-	// Resolve product ID from environment variable
-	const productIdMap: Record<string, string> = {
-		starter: env.CREEM_PRODUCT_ID_STARTER,
-		pro: env.CREEM_PRODUCT_ID_PRO,
-	};
-	const productId = productIdMap[plan];
-	if (!productId) throw error(500, `Missing CREEM_PRODUCT_ID for plan: ${plan}`);
-
 	// serverIdx: 0 = production, 1 = test (auto-detect from API key prefix)
 	const creem = new Creem({
 		apiKey: env.CREEM_API_KEY,
@@ -29,7 +21,7 @@ export const GET: RequestHandler = async ({ url, locals, platform }) => {
 
 	try {
 		const checkout = await creem.checkouts.create({
-			productId,
+			productId: planConfig.creemProductId,
 			successUrl: `${url.origin}/en/app/billing?status=success`,
 			requestId: crypto.randomUUID(),
 			metadata: {
