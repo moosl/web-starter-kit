@@ -4,6 +4,9 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
+	server: {
+		allowedHosts: ['.trycloudflare.com'],
+	},
 	test: {
 		include: ['src/**/*.test.ts'],
 	},

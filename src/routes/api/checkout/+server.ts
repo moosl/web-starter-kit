@@ -1,40 +1,56 @@
 import { error, redirect } from '@sveltejs/kit';
 import { config } from '$lib/config';
+import { Creem } from 'creem';
 import type { RequestHandler } from './$types';
-
-const PLANS: Record<string, { price: number; credits: number; creemProductId: string }> = {
-	starter: { price: 900, credits: 100, creemProductId: 'prod_starter_id' },
-	pro: { price: 2900, credits: 500, creemProductId: 'prod_pro_id' },
-};
 
 export const GET: RequestHandler = async ({ url, locals, platform }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 	if (!config.features.payments) throw error(400, 'Payments disabled');
 
 	const plan = url.searchParams.get('plan');
-	if (!plan || !(plan in PLANS)) throw error(400, 'Invalid plan');
+	if (!plan || !(plan in config.plans)) throw error(400, 'Invalid plan');
 
 	const env = platform!.env;
-	const planConfig = PLANS[plan];
+	const planConfig = config.plans[plan as keyof typeof config.plans];
 
-	const res = await fetch('https://api.creem.io/v1/checkouts', {
-		method: 'POST',
-		headers: {
-			'x-api-key': env.CREEM_API_KEY,
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			product_id: planConfig.creemProductId,
-			success_url: `${url.origin}/en/app/billing?status=success`,
-			request_id: crypto.randomUUID(),
+	// Resolve product ID from environment variable
+	const productIdMap: Record<string, string> = {
+		starter: env.CREEM_PRODUCT_ID_STARTER,
+		pro: env.CREEM_PRODUCT_ID_PRO,
+	};
+	const productId = productIdMap[plan];
+	if (!productId) throw error(500, `Missing CREEM_PRODUCT_ID for plan: ${plan}`);
+
+	// serverIdx: 0 = production, 1 = test (auto-detect from API key prefix)
+	const creem = new Creem({
+		apiKey: env.CREEM_API_KEY,
+		serverIdx: env.CREEM_API_KEY.startsWith('creem_test_') ? 1 : 0,
+	});
+
+	try {
+		const checkout = await creem.checkouts.create({
+			productId,
+			successUrl: `${url.origin}/en/app/billing?status=success`,
+			requestId: crypto.randomUUID(),
 			metadata: {
 				user_id: locals.user.id,
 				plan,
-				credits: planConfig.credits,
+				credits: String(planConfig.credits),
 			},
-		}),
-	});
+		});
 
-	const data = (await res.json()) as { checkout_url: string };
-	throw redirect(302, data.checkout_url);
+		if (!checkout.checkoutUrl) {
+			console.error('Creem response missing checkoutUrl:', checkout);
+			throw error(500, 'Checkout failed: no checkout URL returned');
+		}
+
+		throw redirect(302, checkout.checkoutUrl);
+	} catch (err: any) {
+		// Re-throw SvelteKit redirects and errors
+		if (err?.status && err?.location) throw err;
+		if (err?.status && err?.body) throw err;
+
+		console.error('Creem checkout error:', err);
+		throw error(500, `Checkout failed: ${err.message || String(err)}`);
+	}
 };

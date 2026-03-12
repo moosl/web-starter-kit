@@ -25,7 +25,7 @@ export const actions: Actions = {
 			.from(generations)
 			.where(and(eq(generations.userId, locals.user.id), sql`created_at > ${Date.now() - 60000}`))
 			.get();
-		if (recentCount && recentCount.count >= 5) {
+		if (recentCount && recentCount.count >= 10) {
 			return fail(429, { error: 'Too many requests' });
 		}
 

@@ -39,12 +39,15 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	}
 
 	const payload = JSON.parse(body);
-	if (payload.event !== 'checkout.completed') {
+	console.log('Creem webhook received:', JSON.stringify(payload, null, 2));
+
+	if (payload.eventType !== 'checkout.completed') {
 		return json({ ok: true });
 	}
 
-	const { user_id, plan, credits } = payload.object.metadata;
-	const orderId = payload.object.id;
+	const checkout = payload.object;
+	const { user_id, plan, credits } = checkout.metadata;
+	const orderId = checkout.order?.id ?? checkout.id;
 
 	const db = createDb(env.DB);
 
@@ -55,8 +58,8 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				userId: user_id,
 				creemOrderId: orderId,
 				type: plan,
-				amount: payload.object.amount,
-				currency: payload.object.currency,
+				amount: checkout.order?.amount ?? checkout.amount ?? 0,
+				currency: checkout.order?.currency ?? checkout.currency ?? 'USD',
 				creditsAdded: credits,
 				status: 'paid',
 				createdAt: Date.now(),

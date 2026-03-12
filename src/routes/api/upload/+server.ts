@@ -1,31 +1,30 @@
 import { json, error } from '@sveltejs/kit';
-import { AwsClient } from 'aws4fetch';
 import { config } from '$lib/config';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ locals, platform }) => {
+export const POST: RequestHandler = async ({ locals, platform, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 	if (!config.features.upload) throw error(400, 'Upload disabled');
 
 	const env = platform!.env;
-	const fileKey = `uploads/${locals.user.id}/${crypto.randomUUID()}`;
+	const formData = await request.formData();
+	const file = formData.get('file') as File | null;
 
-	await env.KV.put(`upload:${fileKey}`, locals.user.id, { expirationTtl: 300 });
+	if (!file || !file.size) throw error(400, 'No file provided');
 
-	const r2 = new AwsClient({
-		accessKeyId: env.R2_ACCESS_KEY_ID,
-		secretAccessKey: env.R2_SECRET_ACCESS_KEY,
+	const maxBytes = config.upload.maxSizeMB * 1024 * 1024;
+	if (file.size > maxBytes) throw error(400, `File too large (max ${config.upload.maxSizeMB}MB)`);
+
+	const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+	if (!config.upload.allowedTypes.includes(ext as any)) {
+		throw error(400, `File type not allowed. Accepted: ${config.upload.allowedTypes.join(', ')}`);
+	}
+
+	const fileKey = `uploads/${locals.user.id}/${crypto.randomUUID()}.${ext}`;
+
+	await env.R2.put(fileKey, await file.arrayBuffer(), {
+		httpMetadata: { contentType: file.type },
 	});
 
-	const presignedUrl = await r2.sign(
-		new Request(`${env.R2_ENDPOINT}/${fileKey}`, {
-			method: 'PUT',
-		}),
-		{ aws: { signQuery: true } },
-	);
-
-	return json({
-		uploadUrl: presignedUrl.url,
-		fileKey,
-	});
+	return json({ fileKey });
 };

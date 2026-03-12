@@ -6,11 +6,11 @@ A quick-launch web starter kit for building AI-powered websites, running entirel
 
 ## Features
 
-- **AI Image Generation** — Replicate Flux 1.1 Pro with webhook + sync modes
+- **AI Image Generation** — Replicate Flux 1.1 Pro with webhook + sync modes (mock provider available for testing)
 - **Google OAuth Login** — Session-based auth with 30-day TTL
 - **Credit System** — Freeze-confirm billing model, free credits on signup
 - **Payments** — Creem checkout integration with HMAC-verified webhooks
-- **File Upload** — R2 presigned URLs with ownership-verified image proxy
+- **File Upload** — R2 server-side proxy upload with ownership-verified image proxy
 - **Bot Protection** — Cloudflare Turnstile
 - **i18n** — 4 languages (en/zh/ja/ko) with URL-prefix routing
 - **Alert Emails** — Resend integration with KV rate limiting
@@ -94,6 +94,8 @@ npm run dev      # http://localhost:5173
    ```
 
 > Replicate 新账户有免费额度，够测试用。
+
+**不想接入 Replicate？** 在 `src/lib/config.ts` 中把 `ai.provider` 改为 `'mock'`，会返回占位图，无需 API key，适合测试积分扣除等流程。
 
 ---
 
@@ -224,7 +226,7 @@ src/
 │   ├── i18n/
 │   │   └── messages/        # en.ts, zh.ts, ja.ts, ko.ts
 │   └── server/
-│       ├── ai/              # AI provider factory (Replicate)
+│       ├── ai/              # AI provider factory (Replicate / Mock)
 │       ├── auth/            # Session management, Google OAuth
 │       ├── db/              # Drizzle ORM schema + connection factory
 │       └── alert.ts         # Error alert emails via Resend
@@ -234,7 +236,7 @@ src/
 │   ├── login/google/        # OAuth initiation + callback
 │   └── api/                 # REST endpoints
 │       ├── generate/        # Generation status polling
-│       ├── upload/          # Presigned R2 upload URLs
+│       ├── upload/          # R2 server-side proxy upload
 │       ├── image/           # R2 image proxy
 │       ├── checkout/        # Creem checkout session
 │       └── webhook/         # Creem + Replicate webhooks
@@ -249,7 +251,7 @@ src/
 |---|---|
 | `npm run setup` | One-time local setup (config files + DB migration) |
 | `npm run deploy` | One-command production deploy (resources + secrets + deploy) |
-| `npm run dev` | Start local dev server on port 8787 |
+| `npm run dev` | Start local dev server on port 5173 |
 | `npm run build` | Production build |
 | `npm run check` | TypeScript + Svelte type checking |
 | `npm test` | Run all unit tests (65 tests) |

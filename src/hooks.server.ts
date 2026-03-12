@@ -38,7 +38,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 const handleI18n: Handle = async ({ event, resolve }) => {
 	const { pathname } = event.url;
 
-	if (pathname.startsWith('/api/') || pathname.startsWith('/login')) {
+	if (pathname.startsWith('/api/') || pathname.startsWith('/login') || pathname.startsWith('/.well-known')) {
 		return resolve(event);
 	}
 
@@ -72,7 +72,7 @@ const handleSecurityHeaders: Handle = async ({ event, resolve }) => {
 	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 	response.headers.set(
 		'Content-Security-Policy',
-		"default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' https://*.google-analytics.com",
+		"default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://*.r2.cloudflarestorage.com https://*.googleusercontent.com; connect-src 'self' https://*.google-analytics.com https://*.r2.cloudflarestorage.com; frame-src https://challenges.cloudflare.com",
 	);
 	return response;
 };
@@ -80,6 +80,10 @@ const handleSecurityHeaders: Handle = async ({ event, resolve }) => {
 export const handle = sequence(handleAuth, handleI18n, handleProtectedRoutes, handleSecurityHeaders);
 
 export const handleError: HandleServerError = ({ error, event }) => {
+	if (event.url.pathname.includes('.well-known')) {
+		return { message: 'Not Found', code: 'NOT_FOUND' };
+	}
+
 	console.error('Unhandled error:', error);
 
 	const env = event.platform?.env;

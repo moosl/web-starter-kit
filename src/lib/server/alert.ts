@@ -5,7 +5,8 @@ export async function sendAlert(
 	subject: string,
 	body: string,
 ): Promise<void> {
-	if (!config.alert.email) return;
+	const alertEmail = env.ALERT_EMAIL || config.alert.email;
+	if (!alertEmail) return;
 
 	const key = `alert:count:${Math.floor(Date.now() / 3600000)}`;
 	const count = parseInt((await env.KV.get(key)) ?? '0');
@@ -21,7 +22,7 @@ export async function sendAlert(
 		},
 		body: JSON.stringify({
 			from: 'alert@yourdomain.com',
-			to: config.alert.email,
+			to: alertEmail,
 			subject: `[Alert] ${subject}`,
 			text: body,
 		}),

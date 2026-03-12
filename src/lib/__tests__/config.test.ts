@@ -21,7 +21,7 @@ describe('config', () => {
 
 	describe('ai', () => {
 		it('has provider and defaultModel', () => {
-			expect(config.ai.provider).toBe('replicate');
+			expect(['replicate', 'mock']).toContain(config.ai.provider);
 			expect(config.ai.defaultModel).toBe('flux-1.1-pro');
 		});
 	});

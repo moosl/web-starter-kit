@@ -54,7 +54,11 @@ Freeze-confirm model: credits are deducted on generation start, refunded on fail
 
 ### AI Provider
 
-Factory pattern in `src/lib/server/ai/`. Currently Replicate (Flux 1.1 Pro). Supports sync mode (direct response) and webhook mode (async via `/api/webhook/replicate`).
+Factory pattern in `src/lib/server/ai/`. Providers: `replicate` (Flux 1.1 Pro, sync + webhook modes) and `mock` (returns placeholder images, no API key needed). Set `config.ai.provider` in `src/lib/config.ts` to switch.
+
+### Payments
+
+Creem SDK (`creem` npm package). Checkout endpoint auto-detects test vs production based on API key prefix (`creem_test_*` → `test-api.creem.io`). Webhook payload uses `eventType` field (not `event`).
 
 ### i18n
 
