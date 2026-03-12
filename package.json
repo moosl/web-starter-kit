@@ -33,8 +33,10 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260312.1",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
+    "@tailwindcss/vite": "^4.2.1",
     "drizzle-kit": "^0.31.9",
     "svelte-check": "^4.4.5",
+    "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18",
     "wrangler": "^4.72.0"
