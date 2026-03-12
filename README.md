@@ -32,7 +32,7 @@ npm run setup    # copies config files + creates local database
 接下来配置你需要的 API Key（见下方），然后：
 
 ```bash
-npm run dev      # http://localhost:8787
+npm run dev      # http://localhost:5173
 ```
 
 ## Prerequisites
@@ -65,11 +65,14 @@ npm run dev      # http://localhost:8787
 6. 回到 Credentials 页面，再次点 **+ CREATE CREDENTIALS** > **OAuth client ID**
 7. Application type 选 **Web application**
 8. Name 随意填（如 `web-starter-kit`）
-9. **Authorized redirect URIs** 点 ADD URI，添加：
-   - `http://localhost:8787/login/google/callback`（本地开发）
-   - `https://your-domain.com/login/google/callback`（生产环境，稍后再加也行）
-10. 点 **Create**，复制 **Client ID** 和 **Client Secret**
-11. 填入 `.dev.vars`：
+9. **Authorized JavaScript origins** 点 ADD URI，添加：
+   - `http://localhost:5173`（本地开发）
+   - `https://your-domain.com`（生产环境，稍后再加也行）
+10. **Authorized redirect URIs** 点 ADD URI，添加：
+    - `http://localhost:5173/login/google/callback`（本地开发）
+    - `https://your-domain.com/login/google/callback`（生产环境，稍后再加也行）
+11. 点 **Create**，复制 **Client ID** 和 **Client Secret**
+12. 填入 `.dev.vars`：
     ```
     GOOGLE_CLIENT_ID=xxxxxxxxxxxx.apps.googleusercontent.com
     GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxx
@@ -146,12 +149,13 @@ npm run dev      # http://localhost:8787
 1. 打开 [Cloudflare Dashboard](https://dash.cloudflare.com)
 2. 左侧菜单 > **R2 Object Storage**
 3. 点 **Create bucket**，名字填 `web-starter-kit-uploads`
-4. 回到 R2 概览页，点右上角 **Manage R2 API Tokens**
-5. 点 **Create API token**
+4. 回到 R2 概览页，右侧 Account Details 下点 **API Tokens**
+5. 选择 **Account API Tokens**（推荐），点 **Create API token**
+   - Token name: 随意填（如 `web-starter-kit`）
    - Permissions: **Object Read & Write**
-   - Specify bucket: 选 `web-starter-kit-uploads`
+   - Applied to: 选 `web-starter-kit-uploads`
 6. 创建后复制 **Access Key ID** 和 **Secret Access Key**
-7. 找到你的 **Account ID**（Cloudflare Dashboard 右侧栏，或 URL 中的那串 hex）
+7. **R2_ENDPOINT** 在 R2 概览页右侧 Account Details > **S3 API** 处可以找到，格式为 `https://你的AccountID.r2.cloudflarestorage.com`
 8. 填入 `.dev.vars`：
    ```
    R2_ACCESS_KEY_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -288,7 +292,7 @@ The repo includes `.github/workflows/deploy.yml` — auto-deploys on push to `ma
 → Run `npm run setup` first, or `npm run db:migrate:local` to create the local database.
 
 **OAuth redirect fails**
-→ Check Google Cloud Console redirect URI matches exactly: `http://localhost:8787/login/google/callback`
+→ Check Google Cloud Console redirect URI matches exactly: `http://localhost:5173/login/google/callback`
 
 **"Missing binding" errors in production**
 → All 3 bindings (DB, R2, KV) must have valid IDs in `wrangler.toml`.
