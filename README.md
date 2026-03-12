@@ -281,11 +281,26 @@ One command handles everything:
 
 ### CI/CD (optional)
 
-The repo includes `.github/workflows/deploy.yml` — auto-deploys on push to `main`.
+The repo includes `.github/workflows/deploy.yml` — push to `main` 自动部署。
 
-1. Go to GitHub repo **Settings > Secrets > Actions**
-2. Add `CLOUDFLARE_API_TOKEN` ([create one here](https://dash.cloudflare.com/profile/api-tokens) using "Edit Cloudflare Workers" template)
-3. Push to `main`
+#### 获取 `CLOUDFLARE_API_TOKEN`
+
+1. 打开 [Cloudflare Dashboard](https://dash.cloudflare.com)，点右上角头像 > **My Profile**
+2. 左侧菜单 > **API Tokens**
+3. 点 **Create Token**
+4. 找到 **Edit Cloudflare Workers** 模板，点右侧 **Use template**
+5. 默认权限已包含 Workers、D1、R2、KV 的读写权限，无需修改
+6. Account Resources 选你的账户，Zone Resources 可选 All zones 或指定域名
+7. 点 **Continue to summary** > **Create Token**
+8. 复制生成的 token（只显示一次！）
+
+#### 配置 GitHub Actions
+
+1. 打开你的 GitHub 仓库 > **Settings** > **Secrets and variables** > **Actions**
+2. 点 **New repository secret**
+3. Name 填 `CLOUDFLARE_API_TOKEN`，Value 粘贴刚才复制的 token
+4. 点 **Add secret**
+5. Push 到 `main` 分支即可自动部署
 
 ### Custom Domain
 
