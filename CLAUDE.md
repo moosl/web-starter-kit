@@ -80,3 +80,5 @@ Vitest, pattern `src/**/*.test.ts`. Tests live in `__tests__/` directories adjac
 ## Environment
 
 Secrets go in `.dev.vars` (local) — see `.dev.vars.example`. Public env vars in `.env` — see `.env.example`. Never import from `$env/static/private` at module top level in client code.
+
+Per-deployment config (alert email, Creem product IDs) lives in `.dev.vars` env vars, not hardcoded in `config.ts`. See `ALERT_EMAIL`, `CREEM_PRODUCT_ID_STARTER`, `CREEM_PRODUCT_ID_PRO`.

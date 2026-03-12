@@ -101,20 +101,23 @@ npm run dev      # http://localhost:5173
 
 ### 3. Creem（支付）
 
-**需要配置：** `CREEM_API_KEY` + `CREEM_WEBHOOK_SECRET`
+**需要配置：** `CREEM_API_KEY` + `CREEM_WEBHOOK_SECRET` + `CREEM_PRODUCT_ID_STARTER` + `CREEM_PRODUCT_ID_PRO`
 **对应 feature flag：** `payments`
 
 1. 打开 [creem.io](https://creem.io)，注册/登录
 2. Dashboard 左侧菜单 > **API Keys**
 3. 创建一个 API Key，复制
-4. 左侧菜单 > **Webhooks** > 添加 Webhook endpoint：
+4. 左侧菜单 > **Products** > 创建 Starter 和 Pro 两个产品，复制各自的 Product ID
+5. 左侧菜单 > **Webhooks** > 添加 Webhook endpoint：
    - URL: `https://your-domain.com/api/webhook/creem`（本地测试需要 ngrok 等隧道工具）
    - Events: 勾选 `checkout.completed`
-5. 复制 Webhook signing secret
-6. 填入 `.dev.vars`：
+6. 复制 Webhook signing secret
+7. 填入 `.dev.vars`：
    ```
    CREEM_API_KEY=creem_xxxxxxxxxxxxxxxx
    CREEM_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxx
+   CREEM_PRODUCT_ID_STARTER=prod_xxxxxxxxxxxxxxxx
+   CREEM_PRODUCT_ID_PRO=prod_xxxxxxxxxxxxxxxx
    ```
 
 > 本地测试支付 webhook 需要公网 URL。可以用 [ngrok](https://ngrok.com) 或 [cloudflared tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)。
@@ -169,7 +172,7 @@ npm run dev      # http://localhost:5173
 
 ### 6. Resend（错误告警邮件）
 
-**需要配置：** `RESEND_API_KEY`
+**需要配置：** `RESEND_API_KEY` + `ALERT_EMAIL`
 **无 feature flag**（可选功能，没配就不发邮件）
 
 1. 打开 [resend.com](https://resend.com)，注册/登录
@@ -178,9 +181,8 @@ npm run dev      # http://localhost:5173
 4. 复制 key，填入 `.dev.vars`：
    ```
    RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxx
+   ALERT_EMAIL=your-email@example.com
    ```
-
-> 还需要在 `src/lib/config.ts` 的 `alert.email` 填入接收告警的邮箱地址。
 
 ---
 
@@ -190,11 +192,11 @@ npm run dev      # http://localhost:5173
 |---|---|---|---|
 | 用户登录 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | `auth` | 推荐 |
 | AI 生图 | `REPLICATE_API_TOKEN` | `ai` | 核心功能 |
-| 支付 | `CREEM_API_KEY`, `CREEM_WEBHOOK_SECRET` | `payments` | 可后配 |
+| 支付 | `CREEM_API_KEY`, `CREEM_WEBHOOK_SECRET`, `CREEM_PRODUCT_ID_STARTER`, `CREEM_PRODUCT_ID_PRO` | `payments` | 可后配 |
 | 人机验证 | `TURNSTILE_SECRET_KEY`, `PUBLIC_TURNSTILE_SITE_KEY` | `turnstile` | 可后配 |
 | 文件上传 | `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT` | `upload` | 可后配 |
 | 积分系统 | 无需 key | `credits` | 无需 key |
-| 告警邮件 | `RESEND_API_KEY` | 无（可选） | 可不配 |
+| 告警邮件 | `RESEND_API_KEY`, `ALERT_EMAIL` | 无（可选） | 可不配 |
 
 ## Feature Flags
 
