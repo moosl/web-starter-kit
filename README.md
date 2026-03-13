@@ -272,12 +272,32 @@ npm run deploy
 ```
 
 One command handles everything:
-1. Logs in to Cloudflare (if not already)
-2. Creates D1 database, R2 bucket, KV namespace (skips if they exist)
-3. Auto-updates `wrangler.toml` with resource IDs
-4. Reads secrets from `.dev.vars` and sets them automatically (empty values are skipped)
-5. Migrates remote database
-6. Deploys to Cloudflare Workers
+1. Reads `APP_NAME` from `.dev.vars` (default: `web-starter-kit`)
+2. Logs in to Cloudflare (if not already)
+3. Updates `wrangler.toml` resource names from `APP_NAME`
+4. Creates D1 database, R2 bucket, KV namespace (skips if they exist)
+5. Auto-updates `wrangler.toml` with resource IDs
+6. Reads secrets from `.dev.vars` and sets them automatically (empty values are skipped)
+7. Migrates remote database
+8. Deploys to Cloudflare Workers
+
+### Deploying Multiple Copies
+
+要在同一个 Cloudflare 账号下部署多个副本，只需在 `.dev.vars` 中设置不同的 `APP_NAME`：
+
+```bash
+APP_NAME=my-app
+```
+
+部署脚本会自动派生所有资源名：
+
+| 资源 | 命名规则 | 示例 |
+|---|---|---|
+| Worker | `APP_NAME` | `my-app` |
+| D1 数据库 | `APP_NAME-db` | `my-app-db` |
+| R2 存储桶 | `APP_NAME-uploads` | `my-app-uploads` |
+
+不设置则默认使用 `web-starter-kit`。
 
 ### CI/CD (optional)
 

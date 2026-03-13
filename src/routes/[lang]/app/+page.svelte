@@ -12,6 +12,7 @@
 	let turnstileToken = $state('');
 	let selectedFile = $state<File | null>(null);
 	let selectedFileName = $state('');
+	let previewUrl = $state('');
 	let uploadedFileKey = $state('');
 	let uploadError = $state('');
 
@@ -19,8 +20,10 @@
 		const input = e.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (!file) return;
+		if (previewUrl) URL.revokeObjectURL(previewUrl);
 		selectedFile = file;
 		selectedFileName = file.name;
+		previewUrl = URL.createObjectURL(file);
 		uploadedFileKey = '';
 		uploadError = '';
 	}
@@ -87,11 +90,8 @@
 				<label class="flex items-center justify-center w-full px-4 py-8 border-2 border-dashed rounded-lg cursor-pointer transition-colors {selectedFile ? 'border-indigo-300 bg-indigo-50' : 'border-gray-300 hover:border-gray-400'}">
 					<div class="text-center">
 						{#if selectedFile}
-							<svg class="mx-auto w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-							</svg>
-							<p class="mt-1 text-sm text-indigo-600">{selectedFileName}</p>
-							<p class="mt-0.5 text-xs text-gray-400">Click to change</p>
+							<img src={previewUrl} alt={selectedFileName} class="mx-auto max-h-40 rounded-md object-contain" />
+							<p class="mt-1 text-xs text-gray-400">Click to change</p>
 						{:else}
 							<svg class="mx-auto w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />

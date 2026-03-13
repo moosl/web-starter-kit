@@ -4,6 +4,12 @@
 # Copy this file to .dev.vars and fill in the values you need.
 # =============================================================================
 
+# --- App Name (used for Cloudflare resource naming) ---
+# This controls the Worker name, D1 database name, and R2 bucket name.
+# Change this to deploy multiple copies without resource conflicts.
+# Default: web-starter-kit
+APP_NAME=
+
 # --- Google OAuth (feature flag: auth) ---
 # Get these from: Google Cloud Console > APIs & Services > Credentials
 GOOGLE_CLIENT_ID=

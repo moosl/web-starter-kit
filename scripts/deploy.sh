@@ -13,6 +13,24 @@ else
   WRANGLER="npx wrangler"
 fi
 
+# ── Read APP_NAME from .dev.vars ─────────────
+APP_NAME="web-starter-kit"
+if [ -f ".dev.vars" ]; then
+  _app_name=$(grep -E '^APP_NAME=' .dev.vars | head -1 | cut -d'=' -f2-)
+  if [ -n "$_app_name" ]; then
+    APP_NAME="$_app_name"
+  fi
+fi
+
+WORKER_NAME="$APP_NAME"
+DB_NAME="${APP_NAME}-db"
+R2_NAME="${APP_NAME}-uploads"
+
+echo "  App name:  $WORKER_NAME"
+echo "  D1:        $DB_NAME"
+echo "  R2:        $R2_NAME"
+echo ""
+
 # ── Helper ───────────────────────────────────
 # Update or insert a key in wrangler.toml.
 # Handles: commented-out lines, existing values, and missing keys.
@@ -34,7 +52,7 @@ $key = \"$value\"" "$file" && rm -f "$file.bak"
 }
 
 # ── 1. Check wrangler login ─────────────────
-echo "[1/8] Checking Cloudflare login..."
+echo "[1/9] Checking Cloudflare login..."
 if ! $WRANGLER whoami > /dev/null 2>&1; then
   echo "  Not logged in. Opening browser..."
   $WRANGLER login
@@ -42,9 +60,16 @@ fi
 echo "[OK]  Logged in to Cloudflare"
 echo ""
 
-# ── 2. Create D1 database ───────────────────
-DB_NAME="web-starter-kit-db"
-echo "[2/8] Setting up D1 database..."
+# ── 2. Update wrangler.toml resource names ───
+echo "[2/9] Updating wrangler.toml..."
+sed -i.bak "s|^name = .*|name = \"$WORKER_NAME\"|" wrangler.toml && rm -f wrangler.toml.bak
+sed -i.bak "s|^database_name = .*|database_name = \"$DB_NAME\"|" wrangler.toml && rm -f wrangler.toml.bak
+sed -i.bak "s|^bucket_name = .*|bucket_name = \"$R2_NAME\"|" wrangler.toml && rm -f wrangler.toml.bak
+echo "[OK]  wrangler.toml updated"
+echo ""
+
+# ── 3. Create D1 database ───────────────────
+echo "[3/9] Setting up D1 database..."
 
 DB_JSON=$($WRANGLER d1 list --json 2>/dev/null || echo "[]")
 if echo "$DB_JSON" | grep -q "\"name\":[[:space:]]*\"$DB_NAME\""; then
@@ -67,25 +92,19 @@ if [ -n "$DB_ID" ]; then
 fi
 echo ""
 
-# ── 3. Create R2 bucket ─────────────────────
-R2_NAME="web-starter-kit-uploads"
-echo "[3/8] Setting up R2 bucket..."
+# ── 4. Create R2 bucket ─────────────────────
+echo "[4/9] Setting up R2 bucket..."
 if $WRANGLER r2 bucket list 2>/dev/null | grep -q "$R2_NAME"; then
   echo "[OK]  R2 '$R2_NAME' already exists"
 else
   $WRANGLER r2 bucket create "$R2_NAME" > /dev/null 2>&1
   echo "[OK]  Created R2 '$R2_NAME'"
 fi
-
-if ! grep -q "bucket_name" wrangler.toml; then
-  sed -i.bak '/binding = "R2"/a\
-bucket_name = "'"$R2_NAME"'"' wrangler.toml && rm -f wrangler.toml.bak
-fi
 echo ""
 
-# ── 4. Create KV namespace ──────────────────
+# ── 5. Create KV namespace ──────────────────
 KV_TITLE="KV"
-echo "[4/8] Setting up KV namespace..."
+echo "[5/9] Setting up KV namespace..."
 
 KV_JSON=$($WRANGLER kv namespace list 2>/dev/null || echo "[]")
 EXISTING_KV=$(echo "$KV_JSON" | python3 -c "
@@ -110,8 +129,8 @@ if [ -n "$KV_ID" ]; then
 fi
 echo ""
 
-# ── 5. Set secrets from .dev.vars ─────────────
-echo "[5/8] Configuring secrets..."
+# ── 6. Set secrets from .dev.vars ─────────────
+echo "[6/9] Configuring secrets..."
 echo ""
 
 DEV_VARS_FILE=".dev.vars"
@@ -129,6 +148,8 @@ else
     if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*) ]]; then
       KEY="${BASH_REMATCH[1]}"
       VALUE="${BASH_REMATCH[2]}"
+      # Skip APP_NAME — it's config, not a runtime secret
+      [[ "$KEY" == "APP_NAME" ]] && continue
       if [ -n "$VALUE" ]; then
         echo "$VALUE" | $WRANGLER secret put "$KEY" > /dev/null 2>&1
         SET_COUNT=$((SET_COUNT + 1))
@@ -145,18 +166,18 @@ else
   echo ""
 fi
 
-# ── 6. Generate migrations (if schema changed) ──
-echo "[6/8] Checking for schema changes..."
+# ── 7. Generate migrations (if schema changed) ──
+echo "[7/9] Checking for schema changes..."
 npm run db:generate 2>/dev/null || true
 echo ""
 
-# ── 7. Build ──────────────────────────────────
-echo "[7/8] Building project..."
+# ── 8. Build ──────────────────────────────────
+echo "[8/9] Building project..."
 npm run build
 echo ""
 
-# ── 8. Migrate + Deploy ──────────────────────
-echo "[8/8] Migrating database & deploying..."
+# ── 9. Migrate + Deploy ──────────────────────
+echo "[9/9] Migrating database & deploying..."
 $WRANGLER d1 migrations apply DB --remote
 echo ""
 $WRANGLER deploy
@@ -170,7 +191,7 @@ echo ""
 echo "  Your app is live. Next steps:"
 echo ""
 echo "  1. Add a custom domain:"
-echo "     Cloudflare Dashboard > Workers & Pages > web-starter-kit > Settings > Domains"
+echo "     Cloudflare Dashboard > Workers & Pages > $WORKER_NAME > Settings > Domains"
 echo ""
 echo "  2. Update Google OAuth redirect URI to your production URL:"
 echo "     https://your-domain.com/login/google/callback"
