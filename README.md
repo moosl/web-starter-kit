@@ -1,28 +1,28 @@
 # Web Starter Kit
 
-A quick-launch web starter kit for building AI-powered websites, running entirely on Cloudflare's free tier. The first template is an **AI image generation app** using Replicate's Flux 1.1 Pro model.
+快速启动的 Web 开发模板，用于构建 AI 驱动的网站，完全运行在 Cloudflare 免费套餐上。第一个模板是基于 Replicate Flux 1.1 Pro 模型的 **AI 图片生成应用**。
 
-**Tech stack**: SvelteKit 2 + Svelte 5 · Cloudflare Workers + D1 + R2 + KV · Drizzle ORM · Google OAuth · Creem Payments · Replicate AI
+**技术栈**：SvelteKit 2 + Svelte 5 · Cloudflare Workers + D1 + R2 + KV · Drizzle ORM · Google OAuth · Creem 支付 · Replicate AI
 
-## Features
+## 功能特性
 
-- **AI Image Generation** — Replicate Flux 1.1 Pro with webhook + sync modes (mock provider available for testing)
-- **Google OAuth Login** — Session-based auth with 30-day TTL
-- **Credit System** — Freeze-confirm billing model, free credits on signup
-- **Payments** — Creem checkout integration with HMAC-verified webhooks
-- **File Upload** — R2 server-side proxy upload with ownership-verified image proxy
-- **Bot Protection** — Cloudflare Turnstile
-- **i18n** — 4 languages (en/zh/ja/ko) with URL-prefix routing
-- **Alert Emails** — Resend integration with KV rate limiting
-- **Feature Flags** — Every subsystem independently toggleable
+- **AI 图片生成** — Replicate Flux 1.1 Pro，支持 webhook + 同步模式（内置 mock 模式，无需 API key 即可测试）
+- **Google OAuth 登录** — 基于 Session 的认证，30 天有效期
+- **积分系统** — 冻结-确认扣费模型，注册赠送免费积分
+- **支付** — Creem 结账集成，HMAC 签名验证 webhook
+- **文件上传** — R2 服务端代理上传，带所有权验证的图片代理
+- **人机验证** — Cloudflare Turnstile
+- **国际化** — 4 种语言（en/zh/ja/ko），URL 前缀路由
+- **告警邮件** — Resend 集成，KV 限速
+- **功能开关** — 每个子系统可独立启用/禁用
 
-## Quick Start
+## 快速开始
 
 ```bash
 git clone https://github.com/your-username/web-starter-kit.git
 cd web-starter-kit
 npm install
-npm run setup    # copies config files + creates local database
+npm run setup    # 复制配置文件 + 创建本地数据库
 ```
 
 `npm run setup` 会自动：
@@ -35,23 +35,23 @@ npm run setup    # copies config files + creates local database
 npm run dev      # http://localhost:5173
 ```
 
-## Prerequisites
+## 前置要求
 
 - **Node.js** >= 20
-- A **Cloudflare** account (free tier, only needed for deploy — local dev works without it)
+- **Cloudflare** 账号（免费套餐，仅部署时需要 — 本地开发无需）
 
-## Configuring API Keys
+## 配置 API Key
 
 运行 `npm run setup` 后，编辑项目根目录的 `.dev.vars` 文件，填入你需要的 key。
 
-**不需要全部配完！** 哪个功能的 key 没配，就在 `src/lib/config.ts` 里把对应的 feature flag 设为 `false` 即可（见 [Feature Flags](#feature-flags)）。
+**不需要全部配完！** 哪个功能的 key 没配，就在 `src/lib/config.ts` 里把对应的功能开关设为 `false` 即可（见 [功能开关](#功能开关)）。
 
 ---
 
 ### 1. Google OAuth（用户登录）
 
 **需要配置：** `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET`
-**对应 feature flag：** `auth`
+**对应功能开关：** `auth`
 
 1. 打开 [Google Cloud Console](https://console.cloud.google.com)
 2. 创建项目（或选择已有项目）
@@ -87,7 +87,7 @@ npm run dev      # http://localhost:5173
 ### 2. Replicate（AI 图片生成）
 
 **需要配置：** `REPLICATE_API_TOKEN`
-**对应 feature flag：** `ai`
+**对应功能开关：** `ai`
 
 1. 打开 [replicate.com](https://replicate.com)，注册/登录
 2. 点右上角头像 > **API tokens**（或直接访问 [replicate.com/account/api-tokens](https://replicate.com/account/api-tokens)）
@@ -106,7 +106,7 @@ npm run dev      # http://localhost:5173
 ### 3. Creem（支付）
 
 **需要配置：** `CREEM_API_KEY` + `CREEM_WEBHOOK_SECRET`
-**对应 feature flag：** `payments`
+**对应功能开关：** `payments`
 
 1. 打开 [creem.io](https://creem.io)，注册/登录
 2. Dashboard 左侧菜单 > **API Keys**
@@ -130,7 +130,7 @@ npm run dev      # http://localhost:5173
 ### 4. Cloudflare Turnstile（人机验证）
 
 **需要配置：** `TURNSTILE_SECRET_KEY`（`.dev.vars`）+ `PUBLIC_TURNSTILE_SITE_KEY`（`.env`）
-**对应 feature flag：** `turnstile`
+**对应功能开关：** `turnstile`
 
 1. 打开 [Cloudflare Dashboard](https://dash.cloudflare.com)
 2. 左侧菜单 > **Turnstile**
@@ -152,7 +152,7 @@ npm run dev      # http://localhost:5173
 ### 5. R2 + Presigned Upload（文件上传）
 
 **需要配置：** `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` + `R2_ENDPOINT`
-**对应 feature flag：** `upload`
+**对应功能开关：** `upload`
 
 1. 打开 [Cloudflare Dashboard](https://dash.cloudflare.com)
 2. 左侧菜单 > **R2 Object Storage**
@@ -176,7 +176,7 @@ npm run dev      # http://localhost:5173
 ### 6. Resend（错误告警邮件）
 
 **需要配置：** `RESEND_API_KEY` + `ALERT_EMAIL`
-**无 feature flag**（可选功能，没配就不发邮件）
+**无功能开关**（可选功能，没配就不发邮件）
 
 1. 打开 [resend.com](https://resend.com)，注册/登录
 2. 左侧菜单 > **API Keys**
@@ -189,9 +189,9 @@ npm run dev      # http://localhost:5173
 
 ---
 
-### Key 配置速查表
+### 配置速查表
 
-| Feature | 需要的 Key | Feature Flag | 必须配？ |
+| 功能 | 需要的 Key | 功能开关 | 必须配？ |
 |---|---|---|---|
 | 用户登录 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `PUBLIC_GOOGLE_CLIENT_ID`（`.env`） | `auth` | 推荐 |
 | AI 生图 | `REPLICATE_API_TOKEN` | `ai` | 核心功能 |
@@ -201,7 +201,7 @@ npm run dev      # http://localhost:5173
 | 积分系统 | 无需 key | `credits` | 无需 key |
 | 告警邮件 | `RESEND_API_KEY`, `ALERT_EMAIL` | 无（可选） | 可不配 |
 
-## Feature Flags
+## 功能开关
 
 没配齐 key？编辑 `src/lib/config.ts`，把对应功能关掉：
 
@@ -221,67 +221,67 @@ export const config = {
 
 设为 `false` 后，对应的路由和 hooks 自动跳过，不会因为缺 key 报错。
 
-## Project Structure
+## 项目结构
 
 ```
 src/
-├── hooks.server.ts          # Auth → i18n → route protection → security headers
+├── hooks.server.ts          # 认证 → 国际化 → 路由保护 → 安全头
 ├── lib/
-│   ├── config.ts            # Feature flags and app settings
+│   ├── config.ts            # 功能开关和应用配置
 │   ├── i18n/
 │   │   └── messages/        # en.ts, zh.ts, ja.ts, ko.ts
 │   └── server/
-│       ├── ai/              # AI provider factory (Replicate / Mock)
-│       ├── auth/            # Session management, Google OAuth
-│       ├── db/              # Drizzle ORM schema + connection factory
-│       └── alert.ts         # Error alert emails via Resend
+│       ├── ai/              # AI 提供商工厂（Replicate / Mock）
+│       ├── auth/            # Session 管理、Google OAuth
+│       ├── db/              # Drizzle ORM 数据库模型 + 连接工厂
+│       └── alert.ts         # 通过 Resend 发送错误告警邮件
 ├── routes/
-│   ├── [lang]/              # Public pages (landing, pricing, privacy, terms)
-│   │   └── app/             # Authenticated area (generate, gallery, account, billing)
-│   ├── login/google/        # OAuth initiation + callback
-│   └── api/                 # REST endpoints
-│       ├── generate/        # Generation status polling
-│       ├── upload/          # R2 server-side proxy upload
-│       ├── image/           # R2 image proxy
-│       ├── checkout/        # Creem checkout session
-│       └── webhook/         # Creem + Replicate webhooks
-├── migrations/              # D1 SQL migrations
+│   ├── [lang]/              # 公开页面（首页、定价、隐私政策、服务条款）
+│   │   └── app/             # 需登录区域（生成、画廊、账户、账单）
+│   ├── login/google/        # OAuth 发起 + 回调
+│   └── api/                 # REST 接口
+│       ├── generate/        # 生成状态轮询
+│       ├── upload/          # R2 服务端代理上传
+│       ├── image/           # R2 图片代理
+│       ├── checkout/        # Creem 结账会话
+│       └── webhook/         # Creem + Replicate webhook
+├── migrations/              # D1 SQL 迁移文件
 └── scripts/
-    └── setup.sh             # One-time local setup script
+    └── setup.sh             # 一次性本地初始化脚本
 ```
 
-## Commands
+## 常用命令
 
-| Command | What it does |
+| 命令 | 说明 |
 |---|---|
-| `npm run setup` | One-time local setup (config files + DB migration) |
-| `npm run deploy` | One-command production deploy (resources + secrets + deploy) |
-| `npm run dev` | Start local dev server on port 5173 |
-| `npm run build` | Production build |
-| `npm run check` | TypeScript + Svelte type checking |
-| `npm test` | Run all unit tests (65 tests) |
-| `npm run test:watch` | Tests in watch mode |
-| `npm run db:generate` | Generate migration from schema changes |
-| `npm run db:migrate:local` | Apply migrations to local D1 |
-| `npm run db:studio` | Open Drizzle Studio (visual DB browser) |
+| `npm run setup` | 一次性本地初始化（配置文件 + 数据库迁移） |
+| `npm run deploy` | 一键生产部署（创建资源 + 设置密钥 + 部署） |
+| `npm run dev` | 启动本地开发服务器（端口 5173） |
+| `npm run build` | 生产构建 |
+| `npm run check` | TypeScript + Svelte 类型检查 |
+| `npm test` | 运行全部单元测试（65 个） |
+| `npm run test:watch` | 监听模式运行测试 |
+| `npm run db:generate` | 根据 schema 变更生成迁移文件 |
+| `npm run db:migrate:local` | 将迁移应用到本地 D1 |
+| `npm run db:studio` | 打开 Drizzle Studio（可视化数据库浏览器） |
 
-## Deploying to Production
+## 部署到生产环境
 
 ```bash
 npm run deploy
 ```
 
-One command handles everything:
-1. Reads `APP_NAME` from `.dev.vars` (default: `web-starter-kit`)
-2. Logs in to Cloudflare (if not already)
-3. Updates `wrangler.toml` resource names from `APP_NAME`
-4. Creates D1 database, R2 bucket, KV namespace (skips if they exist)
-5. Auto-updates `wrangler.toml` with resource IDs
-6. Reads secrets from `.dev.vars` and sets them automatically (empty values are skipped)
-7. Migrates remote database
-8. Deploys to Cloudflare Workers
+一条命令搞定一切：
+1. 从 `.dev.vars` 读取 `APP_NAME`（默认：`web-starter-kit`）
+2. 登录 Cloudflare（如果尚未登录）
+3. 根据 `APP_NAME` 更新 `wrangler.toml` 中的资源名
+4. 创建 D1 数据库、R2 存储桶、KV 命名空间（已存在则跳过）
+5. 自动将资源 ID 写入 `wrangler.toml`
+6. 从 `.dev.vars` 读取密钥并自动设置（空值跳过）
+7. 迁移远程数据库
+8. 部署到 Cloudflare Workers
 
-### Deploying Multiple Copies
+### 部署多个副本
 
 要在同一个 Cloudflare 账号下部署多个副本，只需在 `.dev.vars` 中设置不同的 `APP_NAME`：
 
@@ -299,9 +299,9 @@ APP_NAME=my-app
 
 不设置则默认使用 `web-starter-kit`。
 
-### CI/CD (optional)
+### CI/CD（可选）
 
-The repo includes `.github/workflows/deploy.yml` — push to `main` 自动部署。
+项目包含 `.github/workflows/deploy.yml` — 推送到 `main` 分支自动部署。
 
 #### 获取 `CLOUDFLARE_API_TOKEN`
 
@@ -320,28 +320,28 @@ The repo includes `.github/workflows/deploy.yml` — push to `main` 自动部署
 2. 点 **New repository secret**
 3. Name 填 `CLOUDFLARE_API_TOKEN`，Value 粘贴刚才复制的 token
 4. 点 **Add secret**
-5. Push 到 `main` 分支即可自动部署
+5. 推送到 `main` 分支即可自动部署
 
-### Custom Domain
+### 自定义域名
 
-1. Cloudflare Dashboard > **Workers & Pages** > your worker > **Settings > Domains**
-2. Add your domain (must be on Cloudflare DNS)
-3. Update Google OAuth redirect URI to match
+1. Cloudflare Dashboard > **Workers & Pages** > 你的 Worker > **Settings > Domains**
+2. 添加你的域名（必须使用 Cloudflare DNS）
+3. 同步更新 Google OAuth 的重定向 URI
 
-## Troubleshooting
+## 常见问题
 
-**`npm run dev` fails with "D1 database not found"**
-→ Run `npm run setup` first, or `npm run db:migrate:local` to create the local database.
+**`npm run dev` 报错 "D1 database not found"**
+→ 先运行 `npm run setup`，或执行 `npm run db:migrate:local` 创建本地数据库。
 
-**OAuth redirect fails**
-→ Check Google Cloud Console redirect URI matches exactly: `http://localhost:5173/login/google/callback`
+**OAuth 重定向失败**
+→ 检查 Google Cloud Console 中的重定向 URI 是否完全匹配：`http://localhost:5173/login/google/callback`
 
-**"Missing binding" errors in production**
-→ All 3 bindings (DB, R2, KV) must have valid IDs in `wrangler.toml`.
+**生产环境报 "Missing binding" 错误**
+→ `wrangler.toml` 中的 3 个绑定（DB、R2、KV）必须有有效的 ID。
 
-**Type errors after schema changes**
-→ `npm run db:generate` then `npm run db:migrate:local`
+**修改 schema 后出现类型错误**
+→ 先执行 `npm run db:generate`，再执行 `npm run db:migrate:local`
 
-## License
+## 许可证
 
 MIT
